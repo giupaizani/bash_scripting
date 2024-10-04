@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Declaring Variables
+SERVICE="httpd"
+TEMPLATE_URL="https://www.tooplate.com/zip-templates/2098_health.zip"
+FILE_NAME=$(basename "$TEMPLATE_URL" .zip)
+TEMP_FOLDER="/tmp/webfiles"
+HTML_FOLDER="/var/www/html"
+
 # Print Message Function
 function print_message {
     echo -e "########################################"
@@ -10,33 +17,33 @@ function print_message {
 
 # Installing Dependencies
 print_message "Installing packages."
-sudo yum install wget unzip httpd -y > /dev/null
+sudo yum install wget unzip $SERVICE -y > /dev/null
 
 # Start & Enable Service
 print_message "Starting & Enabling HTTPD Service"
-sudo systemctl start httpd
-sudo systemctl enable httpd
+sudo systemctl start $SERVICE
+sudo systemctl enable $SERVICE
 
 # Creating Temp Directory
 print_message "Starting Artifact Deployment"
-mkdir -p /tmp/webfiles
-cd /tmp/webfiles
+mkdir -p $TEMP_FOLDER
+cd $TEMP_FOLDER
 
 # Download and Unzip Files
-wget -q https://www.tooplate.com/zip-templates/2098_health.zip
-unzip -q 2098_health.zip
-sudo cp -r 2098_health/* /var/www/html/
+wget -q $TEMPLATE_URL
+unzip -q $FILE_NAME.zip
+sudo cp -r $FILE_NAME/* $HTML_FOLDER
 
 # Restart Service
 print_message "Restarting HTTPD service"
-sudo systemctl restart httpd
+sudo systemctl restart $SERVICE
 
 # Clean Up
 print_message "Removing Temporary Files"
-rm -rf /tmp/webfiles
+rm -rf $TEMP_FOLDER
 
 # Show Service Status
 print_message "HTTPD Service Status"
-sudo systemctl status httpd --no-pager
+sudo systemctl status $SERVICE --no-pager
 echo
-ls /var/www/html/
+ls $HTML_FOLDER
